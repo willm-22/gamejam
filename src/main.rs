@@ -8,7 +8,7 @@ mod level_placer;
 use level_placer::draw_level;
 
 use bevy::prelude::*;
-mod level1_placer;
+
 mod player;
 
 #[derive(Component)]
