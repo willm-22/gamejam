@@ -3,13 +3,15 @@
 // https://bevy.org/examples/2d-rendering/2d-shapes/ 2.
 // any copied code will be marked with a start and end point
 
-
 mod level_placer;
+mod player;
+mod definitions;
+
 use level_placer::draw_level;
 
 use bevy::prelude::*;
 
-mod player;
+
 
 #[derive(Component)]
 struct Collision;
@@ -31,7 +33,7 @@ fn test(mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>) {
     // add code to run for testing here
-    player::spawn_player(commands, meshes, materials);
+    // player::spawn_player(commands, meshes, materials);
 }
 
 fn startup(

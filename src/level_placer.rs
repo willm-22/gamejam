@@ -1,38 +1,26 @@
 use bevy::prelude::*;
-
-const LEVEL: &str = include_str!("../assets/level1.txt");
-
-const TILE: f32 = 32.0;
-
-#[derive(Component)]
-struct Wall;
-
-#[derive(Component)]
-struct Player;
-
-#[derive(Component)]
-struct LevelEntity;
+use crate::player;
+use crate::definitions;
 
 pub fn draw_level(mut commands: Commands) {
-    let rows: Vec<&str> = LEVEL.lines().collect();
-
+    let rows: Vec<&str> = definitions::LEVEL.lines().collect();
     let height = rows.len() as f32;
     let width = rows[0].len() as f32;
 
 
-    let origin = Vec2::new(-width * TILE / 2.0, height * TILE / 2.0);
+    let origin = Vec2::new(-width * definitions::TILE / 2.0, height * definitions::TILE / 2.0);
 
     for (y, row) in rows.iter().enumerate() {
         for (x, ch) in row.chars().enumerate() {
             let pos = Vec3::new(
-                origin.x + x as f32 * TILE + TILE / 2.0,
-                origin.y - y as f32 * TILE - TILE / 2.0,
+                origin.x + x as f32 * definitions::TILE + definitions::TILE / 2.0,
+                origin.y - y as f32 * definitions::TILE - definitions::TILE / 2.0,
                 0.0,
             );
 
             match ch {
-                '#' => draw_tile(&mut commands, pos, Color::srgb(0.3, 0.3, 0.4), Wall),
-                'P' => draw_tile(&mut commands, pos.with_z(1.0), Color::srgb(0.3, 0.8, 0.4), Player),
+                '#' => draw_tile(&mut commands, pos, Color::srgb(0.3, 0.3, 0.4), definitions::Collision),
+                'P' => player::spawn_player(pos.x, pos.y, &mut commands, Color::srgb(0.3, 0.8, 0.4)),
                 _ => {}
             }
         }
@@ -42,8 +30,8 @@ pub fn draw_level(mut commands: Commands) {
 fn draw_tile(commands: &mut Commands, pos: Vec3, color: Color, marker: impl Component) {
     commands.spawn((
         marker,
-        LevelEntity,
-        Sprite::from_color(color, Vec2::splat(TILE)),
+        definitions::LevelEntity,
+        Sprite::from_color(color, Vec2::splat(definitions::TILE)),
         Transform::from_translation(pos),
     ));
 }
