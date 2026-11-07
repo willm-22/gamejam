@@ -7,6 +7,9 @@
 
 use bevy::prelude::*;
 
+#[derive(Component)]
+struct Player;
+
 // Update main function
 fn main() {
     App::new()
