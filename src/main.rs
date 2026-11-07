@@ -4,16 +4,12 @@
 
 
 // copied from 1. for now
-
+//main.rs
 use bevy::prelude::*;
+use crate::player::PlayerPlugin;
+
 mod player;
 
-
-fn setup_camera(mut commands: Commands) {
-    commands.spawn(Camera2d);
-}
-
-// Update main function
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::WHITE)) // We have updated the bg color to white
@@ -25,5 +21,10 @@ fn main() {
             }),
         )
         .add_systems(Startup, setup_camera)
+        .add_plugins(PlayerPlugin)
         .run();
+}
+
+fn setup_camera(mut commands: Commands) {
+    commands.spawn(Camera2d);
 }
