@@ -4,11 +4,22 @@ pub const PLAYER_WIDTH: f32 = 30.0;
 pub const PLAYER_HEIGHT: f32 = 60.0;
 pub const TILE: f32 = 32.0;
 
-#[derive(Component)]
-pub struct CollisionTop;
+pub enum CollisionAction {
+    Wall,
+    Death,
+    Goal,
+    Nothing,
+}
 
 #[derive(Component)]
-pub struct Collision;
+pub struct CollisionTop {
+    pub action: CollisionAction,
+}
+
+#[derive(Component)]
+pub struct Collision {
+    pub action: CollisionAction,
+}
 
 #[derive(Component)]
 pub struct NoCollision;
