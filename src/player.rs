@@ -65,10 +65,10 @@ pub fn move_player(
     if input.pressed(KeyCode::KeyD) {
         direction.x += 1.0;
     }
-    if input.pressed(KeyCode::ArrowUp) {
+    if input.pressed(KeyCode::KeyW) {
         direction.y += 1.0;
     }
-    if input.pressed(KeyCode::ArrowDown) {
+    if input.pressed(KeyCode::KeyD) {
         direction.y -= 1.0;
     }
 
