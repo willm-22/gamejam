@@ -60,7 +60,6 @@ pub fn move_player(
 
     let mut direction = Vec2::ZERO;
     if input.pressed(KeyCode::KeyA) {
-        println!("HOEAFHIABJDNKIAN");
         direction.x -= 1.0;
     }
     if input.pressed(KeyCode::KeyD) {
