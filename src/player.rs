@@ -5,7 +5,7 @@ const STARTING_PLAYER_VELOCITY: (f32, f32) = (0.0, 0.0);
 
 
 #[derive(Component)]
-struct Velocity {x: f32, y : f32}
+pub struct Velocity {x: f32, y : f32}
 impl Velocity {
     fn init(&mut self, x: f32, y: f32) {
         self.x = x;
@@ -15,6 +15,11 @@ impl Velocity {
     fn new(x: f32, y: f32) -> Velocity {
         Velocity {x, y}
     }
+
+    fn mult(&mut self, num: f32) {
+        self.x = self.x * num;
+    }
+
 }
 
 
@@ -39,27 +44,35 @@ pub fn spawn_player(starting_x: f32, starting_y: f32, commands: &mut Commands,  
 pub fn move_player(
     input: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
-    mut transform: Single<&mut Transform, With<definitions::Player>>)
+    current_movement: Single<(&mut Transform, &mut Velocity), With<definitions::Player>>)
 {
 
-    let mut direction = Vec2::ZERO;
+    let (mut transform, mut velocity) = current_movement.into_inner();
+
     if input.pressed(KeyCode::KeyA) {
-        direction.x -= 1.0;
+        velocity.x -= 10.0;
     }
     if input.pressed(KeyCode::KeyD) {
-        direction.x += 1.0;
+        velocity.x += 10.0;
     }
     if input.pressed(KeyCode::KeyW) {
-        direction.y += 1.0;
+        velocity.y += 10.0;
     }
     if input.pressed(KeyCode::KeyS) {
-        direction.y -= 1.0;
+        velocity.y -= 10.0;
     }
+    
+    velocity.mult(0.95);
 
-    if direction != Vec2::ZERO {
-        let delta = direction.normalize() * (1000.0) * time.delta_secs();
-        transform.translation.x += delta.x;
-        transform.translation.y += delta.y;
-}
+    velocity.y -= 5.0;
+
+    if velocity.x >= 100.0 { velocity.x = 100.0}
+    if velocity.y >= 100.0 { velocity.x = 100.0}
+
+    let delta_x = velocity.x * time.delta_secs();
+    let delta_y = velocity.y * time.delta_secs();
+    transform.translation.x += delta_x;
+    transform.translation.y += delta_y;
+
 }
         

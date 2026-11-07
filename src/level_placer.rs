@@ -19,8 +19,10 @@ pub fn draw_level(mut commands: Commands) {
             );
 
             match ch {
-                '#' => draw_tile(&mut commands, pos, Color::srgb(0.3, 0.3, 0.4), definitions::Collision),
+                '#' => draw_tile(&mut commands, pos, Color::srgb(0.3, 0.3, 0.4), definitions::Collision {action: definitions::CollisionAction::Wall}),
                 'P' => player::spawn_player(pos.x, pos.y, &mut commands, Color::srgb(0.3, 0.8, 0.4)),
+                'G' => draw_tile(&mut commands, pos, Color::srgb(0.3, 0.3, 0.4), definitions::Collision {action: definitions::CollisionAction::Goal}),
+                'X' => draw_tile(&mut commands, pos, Color::srgb(0.3, 0.3, 0.4), definitions::Collision {action: definitions::CollisionAction::Death}),
                 _ => {}
             }
         }

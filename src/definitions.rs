@@ -3,11 +3,22 @@ pub const LEVEL: &str = include_str!("../assets/level1.txt");
 
 pub const TILE: f32 = 32.0;
 
-#[derive(Component)]
-pub struct CollisionTop;
+pub enum CollisionAction {
+    Wall,
+    Death,
+    Goal,
+    Nothing,
+}
 
 #[derive(Component)]
-pub struct Collision;
+pub struct CollisionTop {
+    pub action: CollisionAction,
+}
+
+#[derive(Component)]
+pub struct Collision {
+    pub action: CollisionAction,
+}
 
 #[derive(Component)]
 pub struct NoCollision;
