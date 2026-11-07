@@ -5,6 +5,8 @@
 
 
 use bevy::prelude::*;
+mod level1_placer;
+mod player;
 
 #[derive(Component)]
 struct Collision;
@@ -15,9 +17,17 @@ fn main() {
         .insert_resource(ClearColor(Color::BLACK))
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, startup)
+        .add_systems(Startup, test)
+        .add_systems(Update, player::move_player)
         // .add_systems(Update, bob)
         .run();
 
+}
+fn test(mut commands: Commands, 
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>) {
+    // add code to run for testing here
+    player::spawn_player(commands, meshes, materials);
 }
 
 fn startup(
