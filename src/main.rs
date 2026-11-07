@@ -6,12 +6,16 @@
 
 use bevy::prelude::*;
 
+#[derive(Component)]
+struct Collision;
+
+
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::BLACK))
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, startup)
-        .add_systems(Update, bob)
+        // .add_systems(Update, bob)
         .run();
 
 }
@@ -22,22 +26,30 @@ fn startup(
     mut materials: ResMut<Assets<ColorMaterial>>) 
 {
     commands.spawn(Camera2d);
-    let shape = meshes.add(Circle::new(200.0));
+    let shape = meshes.add(Rectangle::new(200.0, 100.0));
     let mesh = Mesh2d(shape);
     let color = Color::hsl(0.0, 0.95, 0.7); // red hsl(0, 100%, 50%)
 
     commands.spawn(
-               ( mesh,
+               ( 
+                mesh,
                 MeshMaterial2d(materials.add(color)), // 2.
                 Transform::from_xyz(
                 // Distribute shapes from -X_EXTENT/2 to +X_EXTENT/2.
                 100.0,
                 100.0,
                 0.0,
-                ))
+                )
+            )
+            
             );
 }
 
+// fn move_the_rect(
+//     input: Res<ButtonInput<KeyCode>>,
+//     time: Res<Time>,
+
+// )
 fn bob() {
    // bob is a placeholder bob does not do anything
    println!("bob");
