@@ -43,5 +43,3 @@ pub fn check_collision(old_x: f32, old_y: f32, vel_x: f32, vel_y: f32,
 
     }
     
-
-fn measure_distance
