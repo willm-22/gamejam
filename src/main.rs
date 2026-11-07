@@ -4,6 +4,9 @@
 // any copied code will be marked with a start and end point
 
 
+mod level_placer;
+use level_placer::draw_level;
+
 use bevy::prelude::*;
 mod level1_placer;
 mod player;
@@ -16,6 +19,7 @@ fn main() {
     App::new()
         .insert_resource(ClearColor(Color::BLACK))
         .add_plugins(DefaultPlugins)
+        .add_systems(Startup, (startup, draw_level))
         .add_systems(Startup, startup)
         .add_systems(Startup, test)
         .add_systems(Update, player::move_player)
