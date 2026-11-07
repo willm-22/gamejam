@@ -75,6 +75,7 @@ pub fn move_player(
     if direction != Vec2::ZERO {
         let delta = direction.normalize() * (1000.0) * time.delta_secs();
         transform.translation.x += delta.x;
+        transform.translation.y += delta.y;
 }
 }
         
