@@ -12,11 +12,6 @@ use level_placer::draw_level;
 use bevy::prelude::*;
 
 
-
-#[derive(Component)]
-struct Collision;
-
-
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::BLACK))

@@ -23,14 +23,16 @@ pub fn spawn_player(starting_x: f32, starting_y: f32, commands: &mut Commands,  
     // let mesh: Mesh2d = Mesh2d(shape);
     let velocity = Velocity::new(STARTING_PLAYER_VELOCITY.0, STARTING_PLAYER_VELOCITY.1);
     commands.spawn((
-            Sprite::from_color(colour, Vec2::new(definitions::PLAYER_WIDTH, definitions::PLAYER_HEIGHT)),
+            Sprite::from_color(colour, Vec2::new(definitions::PLAYER_SIZE.width, definitions::PLAYER_SIZE.height)),
             Transform::from_xyz(
                 starting_x,
                 starting_y,
                 0.0,
             ),
             definitions::Player,
-            velocity
+            velocity,
+            definitions::LevelEntity,
+            definitions::PLAYER_SIZE
             ));
 }
 

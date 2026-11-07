@@ -33,5 +33,6 @@ fn draw_tile(commands: &mut Commands, pos: Vec3, color: Color, marker: impl Comp
         definitions::LevelEntity,
         Sprite::from_color(color, Vec2::splat(definitions::TILE)),
         Transform::from_translation(pos),
+        definitions::Size {width: 32.0, height: 32.0}
     ));
 }
