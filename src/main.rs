@@ -43,29 +43,13 @@ fn test(mut commands: Commands,
     // player::spawn_player(commands, meshes, materials);
 }
 
-fn startup(
-    mut commands: Commands, 
-    mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>) 
-{
+fn setup(
+    mut commands: Commands,
+    asset_server: Res<AssetServer>,
+    mut layouts: ResMut<Assets<TextureAtlasLayout>>,
+) {
     commands.spawn(Camera2d);
-    let shape = meshes.add(Rectangle::new(200.0, 100.0));
-    let mesh = Mesh2d(shape);
-    let color = Color::hsl(0.0, 0.95, 0.7); // red hsl(0, 100%, 50%)
-
-    commands.spawn(
-               ( 
-                mesh,
-                MeshMaterial2d(materials.add(color)), // 2.
-                Transform::from_xyz(
-                // Distribute shapes from -X_EXTENT/2 to +X_EXTENT/2.
-                100.0,
-                100.0,
-                0.0,
-                )
-            )
-            
-            );
+    level_placer::make_level(&mut commands, &asset_server, &mut layouts, 1);
 }
 
 // fn move_the_rect(
