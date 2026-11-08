@@ -20,10 +20,10 @@ pub fn check_collision(old_x: f32, old_y: f32, vel_x: f32, vel_y: f32,
         let po_top_side = player_transformer.translation.y + p_half_height;
         let po_bottom_side = player_transformer.translation.y - p_half_height;
         
-        let pn_left_side = po_left_side + vel_x - p_half_width;
-        let pn_right_side = po_right_side + vel_x + p_half_width;
-        let pn_top_side = po_top_side + vel_y + p_half_height;
-        let pn_bottom_side = po_bottom_side + vel_y - p_half_height;
+        let pn_left_side = po_left_side + vel_x;
+        let pn_right_side = po_right_side + vel_x;
+        let pn_top_side = po_top_side + vel_y;
+        let pn_bottom_side = po_bottom_side + vel_y;
 
         for (collider_location, collider_size, collider) in collision_all_sides {
             let c_half_height = collider_size.height / 2.0;
@@ -35,10 +35,10 @@ pub fn check_collision(old_x: f32, old_y: f32, vel_x: f32, vel_y: f32,
             let c_bottom_side = collider_location.translation.y - c_half_height;
 
             let collide_bottom: bool = !check_between(c_bottom_side, c_top_side, po_top_side) && check_between(c_bottom_side, c_top_side, pn_top_side) && (check_between(c_left_side, c_right_side, pn_right_side) | check_between(c_left_side, c_right_side, pn_left_side));
-            let collide_top: bool = !check_between(c_bottom_side+5.0, c_top_side-5.0, po_bottom_side) && check_between(c_bottom_side, c_top_side, pn_bottom_side) && (check_between(c_left_side, c_right_side, pn_right_side) | check_between(c_left_side, c_right_side, pn_left_side));
+            let collide_top: bool = !check_between(c_bottom_side, c_top_side, po_bottom_side+20.0) && check_between(c_bottom_side, c_top_side, pn_bottom_side + 20.0) && (check_between(c_left_side, c_right_side, pn_right_side) | check_between(c_left_side, c_right_side, pn_left_side));
             
             let collide_left: bool = !check_between(c_left_side, c_right_side, po_right_side) && (check_between(c_left_side, c_right_side, pn_right_side) && check_between(c_bottom_side, c_top_side, pn_top_side) | check_between(c_bottom_side, c_top_side, pn_bottom_side)) & !(collide_top | collide_bottom);
-            let collide_right: bool = !check_between(c_left_side, c_right_side, po_left_side) && (check_between(c_left_side, c_right_side, pn_right_side) && check_between(c_bottom_side, c_top_side, pn_top_side) | check_between(c_bottom_side, c_top_side, pn_bottom_side)) & !(collide_top | collide_bottom);
+            let collide_right: bool = !check_between(c_left_side, c_right_side, po_left_side) && (check_between(c_left_side, c_right_side, pn_left_side) && check_between(c_bottom_side, c_top_side, pn_top_side) | check_between(c_bottom_side, c_top_side, pn_bottom_side)) & !(collide_top | collide_bottom);
             player.on_ground = collide_top;
             if collide_left | collide_right | collide_top | collide_bottom {
                 match collider.action {
@@ -47,20 +47,16 @@ pub fn check_collision(old_x: f32, old_y: f32, vel_x: f32, vel_y: f32,
                     definitions::CollisionAction::Goal => {println!("YAY")},
                     definitions::CollisionAction::Wall => {
                         if collide_top && vel_y < 0.0 {
-                            println!("{}", vel_y);
-                            player_transformer.translation.y = c_top_side + p_half_height;
+                           
                             return Stop::Verticle;
                         }
                         if collide_bottom && vel_y > 0.0 {
-                            player_transformer.translation.y = c_bottom_side - p_half_height;
                             return Stop::Verticle;
                         }
                         if collide_right && vel_x < 0.0 {
-                            player_transformer.translation.x = c_right_side + p_half_width;
                             return Stop::Sideways;
                         }
                         if collide_left && vel_x > 0.0 {
-                            player_transformer.translation.x = c_left_side - p_half_width;
                             return Stop::Sideways;
                         }
                     },

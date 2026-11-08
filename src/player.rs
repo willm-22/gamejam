@@ -56,42 +56,40 @@ pub fn move_player(
     collision_all_sides: Query<(&Transform, &definitions::Size, &definitions::Collision), Without<definitions::Player>>)
 {
     let (mut transform, mut velocity, ssize, mut player) = player.into_inner();
-    let delta_time = time.delta_secs().min(1.0 / 30.0);
+    let delta_time = time.delta_secs();
     const JUMP: f32 = 1000.0;
     if input.pressed(KeyCode::KeyA) {velocity.x -= 100.0;}
     if input.pressed(KeyCode::KeyD) {velocity.x += 100.0;}
 
     if input.pressed(KeyCode::KeyW) && player.on_ground {
-        velocity.y = 700.0;
+        velocity.y = JUMP;
     } 
     if !player.on_ground {
-        velocity.y -= 100.0 * delta_time;
+        velocity.y -= 10.0;
     }
 
-    if input.pressed(KeyCode::KeyS) { velocity.y -= 100.0; }
+    if input.pressed(KeyCode::KeyS) { velocity.y -= 10.0; }
 
-    velocity.x = velocity.x.clamp(-500.0, 500.0);
-    velocity.y = velocity.y.clamp(-500.0, 500.0);
+    velocity.x = velocity.x * delta_time;
+    velocity.y = velocity.y * delta_time;
 
-
-    let mut step_x = velocity.x * delta_time;
-    let mut step_y = velocity.y * delta_time;
 
     match collision::check_collision(
         transform.translation.x, transform.translation.y,
-        step_x, step_y,
+        velocity.x, velocity.y,
         &mut *transform, ssize, &mut *player, &collision_all_sides,
     ) {
         collision::Stop::None => {
-            transform.translation.x += step_x;
-            transform.translation.y += step_y;
+            transform.translation.x += velocity.x;
+            transform.translation.y += velocity.y;
         }
         collision::Stop::Verticle => {
-            transform.translation.x += step_x;
-            velocity.y = 0.0;
+            transform.translation.x += velocity.x;
+             println!("{}", velocity.y);
+            // velocity.y = 0.0;
         }
         collision::Stop::Sideways => {
-            transform.translation.y += step_y;
+            transform.translation.y += velocity.y;
             velocity.x = 0.0;
         }
     }
