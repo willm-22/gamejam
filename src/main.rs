@@ -6,10 +6,8 @@
 mod level_placer;
 mod player;
 mod definitions;
-mod clock;
 mod collision;
-mod music;
-
+mod clock;
 use level_placer::draw_level;
 
 use bevy::prelude::*;
@@ -18,16 +16,18 @@ use bevy::prelude::*;
 fn main() {
     App::new()
         .insert_resource(ClearColor(Color::BLACK))
-        .add_plugins(DefaultPlugins)
+        .add_plugins(DefaultPlugins.set(WindowPlugin {
+            primary_window: Some(Window {
+                title: "Robert the Roofer".into(),
+                resizable: true,
+                ..default()
+            }),
+            ..default()
+        }))
         .add_systems(Startup, (startup, draw_level))
         .add_systems(Startup, startup)
-        .add_systems(Startup, clock::setup_clock)
         .add_systems(Startup, test)
-        .add_systems(Startup, music::setup_music)
         .add_systems(Update, player::move_player)
-        .add_systems(Update, clock::update_clock)
-        .add_systems(Update, clock::update_clock_text)
-        .add_systems(Update, player::animate_player)
         // .add_systems(Update, bob)
         .run();
 

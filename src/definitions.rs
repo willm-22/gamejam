@@ -53,3 +53,4 @@ pub struct Size {
 }
 
 pub const PLAYER_SIZE: Size = Size {width: 20.0, height: 20.0};
+static mut LEVEL_NUM: i32 = 0;
