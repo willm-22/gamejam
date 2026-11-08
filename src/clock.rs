@@ -1,6 +1,5 @@
 use bevy::prelude::*;
 use crate::definitions;
-use crate::player::Velocity;
 
 #[derive(Resource)]
 pub struct GameClock {
@@ -19,7 +18,7 @@ pub fn setup_clock(mut commands: Commands) {
 pub fn update_clock(
     time: Res<Time>,
     mut clock: ResMut<GameClock>,
-    player: Single<&Velocity, With<definitions::Player>>,
+    player: Single<&definitions::Velocity, With<definitions::Player>>,
 ) {
     clock.scale = 1.0 - (player.speed() / 100.0).min(1.0) * 0.6;
     clock.remaining = (clock.remaining - time.delta_secs() * clock.scale).max(0.0);

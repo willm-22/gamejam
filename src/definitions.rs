@@ -27,6 +27,9 @@ impl Velocity {
         self.x = self.x * num;
     }
 
+    pub fn speed(&self) -> f32 {
+        self.x * self.x + self.y * self.y
+    }
 }
 
 #[derive(Component)]
@@ -41,7 +44,7 @@ pub struct NoCollision;
 pub struct LevelEntity;
 
 #[derive(Component)]
-pub struct Player;
+pub struct Player{pub on_ground: bool}
 
 #[derive(Component)]
 pub struct Size {
