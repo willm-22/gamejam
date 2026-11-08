@@ -89,12 +89,10 @@ pub fn move_player(
         collision::Stop::Verticle => {
             transform.translation.x += step_x;
             velocity.y = 0.0;
-            step_y = 0.0; // stop pushing into the floor/ceiling for the rest of the frame
         }
         collision::Stop::Sideways => {
             transform.translation.y += step_y;
             velocity.x = 0.0;
-            step_x = 0.0; // stop pushing into the wall
         }
     }
 }
