@@ -4,6 +4,7 @@ pub const LEVEL: &str = include_str!("../assets/level1.txt");
 pub const TILE: f32 = 32.0;
 
 pub enum CollisionAction {
+    Move,
     Wall,
     Death,
     Goal,
@@ -53,4 +54,6 @@ pub struct Size {
 }
 
 pub const PLAYER_SIZE: Size = Size {width: 20.0, height: 20.0};
-static mut LEVEL_NUM: i32 = 0;
+
+#[derive(Component)]
+pub struct Moving {pub change: Velocity, pub flip: f32}

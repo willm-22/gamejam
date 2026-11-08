@@ -23,7 +23,7 @@ pub fn draw_level(mut commands: Commands, asset_server: Res<AssetServer>, mut la
                 'P' => player::spawn_player(pos.x, pos.y, &mut commands, &asset_server, &mut layouts),
                 'G' => draw_tile(&mut commands, pos, Color::srgb(0.3, 0.3, 0.4), definitions::Collision {action: definitions::CollisionAction::Goal}),
                 'X' => draw_tile(&mut commands, pos, Color::srgb(0.3, 0.3, 0.4), definitions::Collision {action: definitions::CollisionAction::Death}),
-                'T' => draw_tile(&mut commands, pos, Color::srgb(0.3, 0.3, 0.4), definitions::Collision {action: definitions::CollisionAction::Top}),
+                'T' => draw_tile(&mut commands, pos, Color::srgb(0.8, 0.8, 0.2), definitions::Collision {action: definitions::CollisionAction::Top}),
                 _ => {}
             }
         }
