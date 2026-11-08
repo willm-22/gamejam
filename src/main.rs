@@ -25,7 +25,6 @@ fn main() {
             }),
             ..default()
         }))
-        .add_systems(Startup, (startup, draw_level))
         .add_systems(Startup, startup)
         .add_systems(Startup, test)
         .add_systems(Startup, music::setup_music)
