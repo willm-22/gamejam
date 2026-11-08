@@ -35,7 +35,7 @@ pub fn check_collision(old_x: f32, old_y: f32, vel_x: f32, vel_y: f32,
             let c_bottom_side = collider_location.translation.y - c_half_height;
 
             let collide_bottom: bool = !check_between(c_bottom_side, c_top_side, po_top_side) && check_between(c_bottom_side, c_top_side, pn_top_side) && (check_between(c_left_side, c_right_side, pn_right_side) | check_between(c_left_side, c_right_side, pn_left_side));
-            let collide_top: bool = !check_between(c_bottom_side, c_top_side, po_bottom_side) && check_between(c_bottom_side, c_top_side, pn_bottom_side) && (check_between(c_left_side, c_right_side, pn_right_side) | check_between(c_left_side, c_right_side, pn_left_side));
+            let collide_top: bool = !check_between(c_bottom_side+5.0, c_top_side-5.0, po_bottom_side) && check_between(c_bottom_side, c_top_side, pn_bottom_side) && (check_between(c_left_side, c_right_side, pn_right_side) | check_between(c_left_side, c_right_side, pn_left_side));
             
             let collide_left: bool = !check_between(c_left_side, c_right_side, po_right_side) && (check_between(c_left_side, c_right_side, pn_right_side) && check_between(c_bottom_side, c_top_side, pn_top_side) | check_between(c_bottom_side, c_top_side, pn_bottom_side)) & !(collide_top | collide_bottom);
             let collide_right: bool = !check_between(c_left_side, c_right_side, po_left_side) && (check_between(c_left_side, c_right_side, pn_right_side) && check_between(c_bottom_side, c_top_side, pn_top_side) | check_between(c_bottom_side, c_top_side, pn_bottom_side)) & !(collide_top | collide_bottom);
@@ -45,7 +45,8 @@ pub fn check_collision(old_x: f32, old_y: f32, vel_x: f32, vel_y: f32,
                     definitions::CollisionAction::Death => {println!("Ow");},
                     definitions::CollisionAction::Goal => {println!("YAY")},
                     definitions::CollisionAction::Wall => {
-                        if collide_top && vel_y < 0.0 {
+                        if (collide_top && vel_y < 0.0) {
+                            println!("{}", vel_y);
                             player_transformer.translation.y = c_top_side + p_half_height;
                             return Stop::Verticle;
                         }
