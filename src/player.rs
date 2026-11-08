@@ -6,24 +6,6 @@ use crate::collision;
 
 const STARTING_PLAYER_VELOCITY: (f32, f32) = (0.0, 0.0);
 
-
-#[derive(Component)]
-pub struct Velocity {x: f32, y : f32}
-impl Velocity {
-    fn new(x: f32, y: f32) -> Velocity {
-        Velocity {x, y}
-    }
-
-    fn mult(&mut self, num: f32) {
-        self.x = self.x * num;
-    }
-
-    pub fn speed(&self) -> f32 {
-        Vec2::new(self.x, self.y).length()
-    }
-
-}
-
 #[derive(Component)]
 pub struct AnimationTimer(pub Timer);
 
@@ -39,7 +21,7 @@ pub struct AnimationIndices {
 pub fn spawn_player(starting_x: f32, starting_y: f32, commands: &mut Commands, asset_server: &AssetServer, layouts: &mut Assets<TextureAtlasLayout>) {
     // let shape: Handle<Mesh> = meshes.add(Rectangle::new(PLAYER_WIDTH, PLAYER_HEIGHT));
     // let mesh: Mesh2d = Mesh2d(shape);
-    let velocity = Velocity::new(STARTING_PLAYER_VELOCITY.0, STARTING_PLAYER_VELOCITY.1);
+    let velocity = definitions::Velocity::new(STARTING_PLAYER_VELOCITY.0, STARTING_PLAYER_VELOCITY.1);
     let player = asset_server.load("player.png");
     let layout = layouts.add(TextureAtlasLayout::from_grid(UVec2::new(32, 32), 4, 1, None, None));
     let indices = AnimationIndices { first: 0, last: 3 };
@@ -58,8 +40,8 @@ pub fn spawn_player(starting_x: f32, starting_y: f32, commands: &mut Commands, a
                 starting_y,
                 0.0,
             ),
-            definitions::Player,
-            // velocity,
+            definitions::Player {on_ground: false},
+            velocity,
             indices,
             AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
             definitions::LevelEntity,
@@ -70,46 +52,46 @@ pub fn spawn_player(starting_x: f32, starting_y: f32, commands: &mut Commands, a
 pub fn move_player(
     input: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
-    player: Single<(&mut Transform, &mut definitions::Velocity, &definitions::Size), With<definitions::Player>>,
+    player: Single<(&mut Transform, &mut definitions::Velocity, &definitions::Size, &mut definitions::Player), With<definitions::Player>>,
     collision_all_sides: Query<(&mut Transform, &definitions::Size, &definitions::Collision), Without<definitions::Player>>)
 {
 
-    let (mut transform, mut velocity, ssize) = player.into_inner();
+    let (mut transform, mut velocity, ssize, mut player) = player.into_inner();
 
     let delta_time = time.delta_secs();
     const ACCEL: f32 = 600.0;
-    const GRAVITY: f32 = 300.0;
+    const GRAVITY: f32 = 700.0;
 
     if input.pressed(KeyCode::KeyA) { velocity.x -= ACCEL * delta_time; }
 
     if input.pressed(KeyCode::KeyD) { velocity.x += ACCEL * delta_time; }
 
-    if input.pressed(KeyCode::KeyW) { velocity.y += ACCEL * delta_time; }
+    if input.pressed(KeyCode::KeyW) && player.on_ground { velocity.y += ACCEL * delta_time * 1000.0; } else {
+        velocity.y -= GRAVITY * delta_time;
+    }
 
     if input.pressed(KeyCode::KeyS) { velocity.y -= ACCEL * delta_time; }
-
     velocity.mult(0.95);
-
-    velocity.y -= GRAVITY * delta_time;
+    
+    
 
     if velocity.x >= 100.0 { velocity.x = 100.0}
     if velocity.x <= -100.0 { velocity.x = -100.0}
     if velocity.y >= 100.0 { velocity.y = 100.0}
     if velocity.y <= -100.0 { velocity.y = -100.0}
 
-    let delta_x = velocity.x * time.delta_secs();
-    let delta_y = velocity.y * time.delta_secs();
-    match collision::check_collision( transform.translation.x,  transform.translation.y, delta_x, delta_y, &mut *transform, ssize, collision_all_sides) {
-        collision::Stop::None => {transform.translation.x += delta_x;
+    let delta_x = velocity.x * delta_time;
+    let delta_y = velocity.y * delta_time;
+    println!("x vel is {}, y vel is {}", delta_x, delta_y);
+    match collision::check_collision( transform.translation.x,  transform.translation.y, delta_x, delta_y, &mut *transform, ssize, &mut *player, collision_all_sides) {
+        collision::Stop::None => {
+            transform.translation.x += delta_x;
             transform.translation.y += delta_y;}
         collision::Stop::Verticle => {transform.translation.x += delta_x; 
             velocity.y = 0.0;}
         collision::Stop::Sideways => {transform.translation.y += delta_y;
         velocity.x = 0.0;}
-         
     }
-
-
 }
 
 pub fn animate_player(

@@ -5,7 +5,7 @@ use crate::definitions;
 pub enum Stop {Sideways, Verticle, None}
 //very much based on https://bevy.org/examples/games/breakout/
 pub fn check_collision(old_x: f32, old_y: f32, vel_x: f32, vel_y: f32,
-    player_transformer: &mut Transform, player_size: &definitions::Size,
+    player_transformer: &mut Transform, player_size: &definitions::Size, player: &mut definitions::Player,
     collision_all_sides: Query<(&mut Transform, &definitions::Size, &definitions::Collision), Without<definitions::Player>>,
     ) -> Stop {
         // let (mut player_transformer, velocity, player_size) = player.into_inner();
@@ -39,7 +39,7 @@ pub fn check_collision(old_x: f32, old_y: f32, vel_x: f32, vel_y: f32,
             
             let collide_left: bool = !check_between(c_left_side, c_right_side, po_right_side) && (check_between(c_left_side, c_right_side, pn_right_side) && check_between(c_bottom_side, c_top_side, pn_top_side) | check_between(c_bottom_side, c_top_side, pn_bottom_side)) & !(collide_top | collide_bottom);
             let collide_right: bool = !check_between(c_left_side, c_right_side, po_left_side) && (check_between(c_left_side, c_right_side, pn_right_side) && check_between(c_bottom_side, c_top_side, pn_top_side) | check_between(c_bottom_side, c_top_side, pn_bottom_side)) & !(collide_top | collide_bottom);
-            
+            player.on_ground = collide_top;
             if collide_left | collide_right | collide_top | collide_bottom {
                 match collider.action {
                     definitions::CollisionAction::Death => {println!("Ow");},
