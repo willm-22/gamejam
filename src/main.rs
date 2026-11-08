@@ -9,13 +9,8 @@ mod definitions;
 mod collision;
 mod music;
 mod clock;
-<<<<<<< HEAD
-mod camera;
 mod grapple;
-
-=======
 use level_placer::draw_level;
->>>>>>> parent of 6056e7b (camera)
 
 use bevy::prelude::*;
 

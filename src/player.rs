@@ -76,24 +76,6 @@ pub fn move_player(
     let delta_x = velocity.x * delta_time;
     let delta_y = velocity.y * delta_time;
 
-<<<<<<< HEAD
-    match collision::check_collision(
-        transform.translation.x, transform.translation.y,
-        velocity.x, velocity.y,
-        &mut *transform, ssize, &mut *player, &collision_all_sides,
-    ) {
-        collision::Stop::None => {
-            transform.translation.x += velocity.x;
-            transform.translation.y += velocity.y;
-        }
-        collision::Stop::Verticle => {
-            transform.translation.x += velocity.x;
-             println!("{}", velocity.y);
-            // velocity.y = 0.0;
-        }
-        collision::Stop::Sideways => {
-            transform.translation.y += velocity.y;
-=======
     println!("vx = {:.0}, grounded = {}", velocity.x, player.on_ground);
 
     match collision::check_collision(transform.translation.x, transform.translation.y, delta_x, delta_y, &mut *transform, ssize, &mut *player, collision_all_sides) {
@@ -107,7 +89,6 @@ pub fn move_player(
         }
         collision::Stop::Sideways => {
             transform.translation.y += delta_y;
->>>>>>> parent of 6056e7b (camera)
             velocity.x = 0.0;
         }
     }
