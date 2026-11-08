@@ -8,6 +8,7 @@ mod player;
 mod definitions;
 mod clock;
 mod collision;
+mod music;
 
 use level_placer::draw_level;
 
@@ -22,6 +23,7 @@ fn main() {
         .add_systems(Startup, startup)
         .add_systems(Startup, clock::setup_clock)
         .add_systems(Startup, test)
+        .add_systems(Startup, music::setup_music)
         .add_systems(Update, player::move_player)
         .add_systems(Update, clock::update_clock)
         .add_systems(Update, clock::update_clock_text)
