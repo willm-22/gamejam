@@ -56,3 +56,5 @@ pub const PLAYER_SIZE: Size = Size {width: 20.0, height: 20.0};
 
 #[derive(Component)]
 pub struct Moving {pub change: Velocity, pub flip: f32}
+
+
