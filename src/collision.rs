@@ -45,7 +45,7 @@ pub fn check_collision(old_x: f32, old_y: f32, vel_x: f32, vel_y: f32,
                     definitions::CollisionAction::Death => {println!("Ow");},
                     definitions::CollisionAction::Goal => {println!("YAY")},
                     definitions::CollisionAction::Wall => {
-                        if (collide_top && vel_y < 0.0) {
+                        if collide_top && vel_y < 0.0 {
                             println!("{}", vel_y);
                             player_transformer.translation.y = c_top_side + p_half_height;
                             return Stop::Verticle;
