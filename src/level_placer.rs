@@ -25,7 +25,7 @@ pub fn draw_level(
             match ch {
                 '#' => draw_tile(commands, pos, Color::srgb(0.3, 0.3, 0.4), definitions::Collision { action: definitions::CollisionAction::Wall }),
                 'P' => player::spawn_player(pos.x, pos.y, commands, asset_server, layouts),
-                'G' => draw_tile(commands, pos, Color::srgb(0.3, 0.3, 0.4), definitions::Collision { action: definitions::CollisionAction::Goal }),
+                'G' => draw_goal(commands, pos, asset_server, definitions::Collision { action: definitions::CollisionAction::Goal }),
                 'X' => draw_tile(commands, pos, Color::srgb(0.3, 0.3, 0.4), definitions::Collision { action: definitions::CollisionAction::Death }),
                 'T' => draw_tile(commands, pos, Color::srgb(0.8, 0.8, 0.2), definitions::Collision { action: definitions::CollisionAction::Top }),
                 _ => {}
@@ -39,6 +39,16 @@ fn draw_tile(commands: &mut Commands, pos: Vec3, color: Color, marker: impl Comp
         marker,
         definitions::LevelEntity,
         Sprite::from_color(color, Vec2::splat(definitions::TILE)),
+        Transform::from_translation(pos),
+        definitions::Size { width: 32.0, height: 32.0 },
+    ));
+}
+
+fn draw_goal(commands: &mut Commands, pos: Vec3,  asset_server: &AssetServer, marker: impl Component) {
+    commands.spawn((
+        marker,
+        definitions::LevelEntity,
+        Sprite::from_image(asset_server.load("flag.png")),
         Transform::from_translation(pos),
         definitions::Size { width: 32.0, height: 32.0 },
     ));

@@ -55,42 +55,60 @@ pub fn move_player(
     player: Single<(&mut Transform, &mut definitions::Velocity, &definitions::Size, &mut definitions::Player), With<definitions::Player>>,
     collision_all_sides: Query<(&mut Transform, &definitions::Size, &definitions::Collision), Without<definitions::Player>>)
 {
-
     let (mut transform, mut velocity, ssize, mut player) = player.into_inner();
+    let delta_time = time.delta_secs().min(1.0 / 30.0);
 
-    let delta_time = time.delta_secs();
-    const ACCEL: f32 = 10.0;
-    const GRAVITY: f32 = 7.0;
+    const BASE_ACCEL: f32 = 300.0;
+    const GROWTH: f32 = 3.0;
+    const BRAKE: f32 = 8000.0;
+    const DOWN_ACCEL: f32 = 1500.0;
+    const GRAVITY: f32 = 1500.0;
+    const JUMP_SPEED: f32 = 1000.0;
+    const MAX_X: f32 = 1000.0;
+    const MAX_FALL: f32 = 1250.0;
 
-    if input.pressed(KeyCode::KeyA) { velocity.x -= ACCEL * delta_time; }
+    let mut dir = 0.0;
+    if input.pressed(KeyCode::KeyA) { dir -= 1.0; }
+    if input.pressed(KeyCode::KeyD) { dir += 1.0; }
 
-    if input.pressed(KeyCode::KeyD) { velocity.x += ACCEL * delta_time; }
-
-    if input.pressed(KeyCode::KeyW) && player.on_ground { velocity.y = 300.0 * delta_time; } else {
-        velocity.y -= GRAVITY * delta_time;
+    if dir != 0.0 {
+        let accel = if velocity.x * dir >= 0.0 {
+            BASE_ACCEL + GROWTH * velocity.x.abs()
+        } else {
+            BRAKE
+        };
+        velocity.x += dir * accel * delta_time;
     }
 
-    if input.pressed(KeyCode::KeyS) { velocity.y -= ACCEL * delta_time; }
-    velocity.mult(0.95);
-    
-    
+    if input.pressed(KeyCode::KeyW) && player.on_ground {
+        velocity.y = JUMP_SPEED;
+    } else {
+        velocity.y -= GRAVITY * delta_time;
+    }
+    if input.pressed(KeyCode::KeyS) { velocity.y -= DOWN_ACCEL * delta_time; }
 
-    if velocity.x >= 300.0 { velocity.x = 300.0}
-    if velocity.x <= -300.0 { velocity.x = -300.0}
-    if velocity.y >= 300.0 { velocity.y = 300.0}
-    if velocity.y <= -300.0 { velocity.y = -300.0}
+    velocity.x *= 0.97_f32.powf(delta_time * 60.0);
+    velocity.x = velocity.x.clamp(-MAX_X, MAX_X);
+    velocity.y = velocity.y.clamp(-MAX_FALL, JUMP_SPEED);
 
-    let delta_x = velocity.x;
-    let delta_y = velocity.y;
-    // println!("x vel is {}, y vel is {}", delta_x, delta_y);
-    match collision::check_collision( transform.translation.x,  transform.translation.y, delta_x, delta_y, &mut *transform, ssize, &mut *player, collision_all_sides) {
+    let delta_x = velocity.x * delta_time;
+    let delta_y = velocity.y * delta_time;
+
+    println!("vx = {:.0}, grounded = {}", velocity.x, player.on_ground);
+
+    match collision::check_collision(transform.translation.x, transform.translation.y, delta_x, delta_y, &mut *transform, ssize, &mut *player, collision_all_sides) {
         collision::Stop::None => {
             transform.translation.x += delta_x;
-            transform.translation.y += delta_y;}
-        collision::Stop::Verticle => {transform.translation.x += delta_x; 
-            velocity.y = 0.0;}
-        collision::Stop::Sideways => {transform.translation.y += delta_y;
-        velocity.x = 0.0;}
+            transform.translation.y += delta_y;
+        }
+        collision::Stop::Verticle => {
+            transform.translation.x += delta_x;
+            velocity.y = 0.0;
+        }
+        collision::Stop::Sideways => {
+            transform.translation.y += delta_y;
+            velocity.x = 0.0;
+        }
     }
 }
 
