@@ -17,7 +17,7 @@ pub fn grapple(
     // decide closest
     for (collide, trans) in &rectange {
         let distance = calc_dis_square(p_x, p_y, trans.translation.x, trans.translation.y);
-        if distance < closest && distance < 700.0 {closest = distance; closest_pos = trans}
+        if distance < closest {closest = distance; closest_pos = trans}
     }
 
     if closest_pos == &ZERO {return;}
