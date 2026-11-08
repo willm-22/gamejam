@@ -59,14 +59,14 @@ pub fn move_player(
     let (mut transform, mut velocity, ssize, mut player) = player.into_inner();
 
     let delta_time = time.delta_secs();
-    const ACCEL: f32 = 600.0;
-    const GRAVITY: f32 = 700.0;
+    const ACCEL: f32 = 10.0;
+    const GRAVITY: f32 = 7.0;
 
     if input.pressed(KeyCode::KeyA) { velocity.x -= ACCEL * delta_time; }
 
     if input.pressed(KeyCode::KeyD) { velocity.x += ACCEL * delta_time; }
 
-    if input.pressed(KeyCode::KeyW) && player.on_ground { velocity.y += ACCEL * delta_time * 1000.0; } else {
+    if input.pressed(KeyCode::KeyW) && player.on_ground { velocity.y = 300.0 * delta_time; } else {
         velocity.y -= GRAVITY * delta_time;
     }
 
@@ -75,14 +75,14 @@ pub fn move_player(
     
     
 
-    if velocity.x >= 100.0 { velocity.x = 100.0}
-    if velocity.x <= -100.0 { velocity.x = -100.0}
-    if velocity.y >= 100.0 { velocity.y = 100.0}
-    if velocity.y <= -100.0 { velocity.y = -100.0}
+    if velocity.x >= 300.0 { velocity.x = 300.0}
+    if velocity.x <= -300.0 { velocity.x = -300.0}
+    if velocity.y >= 300.0 { velocity.y = 300.0}
+    if velocity.y <= -300.0 { velocity.y = -300.0}
 
-    let delta_x = velocity.x * delta_time;
-    let delta_y = velocity.y * delta_time;
-    println!("x vel is {}, y vel is {}", delta_x, delta_y);
+    let delta_x = velocity.x;
+    let delta_y = velocity.y;
+    // println!("x vel is {}, y vel is {}", delta_x, delta_y);
     match collision::check_collision( transform.translation.x,  transform.translation.y, delta_x, delta_y, &mut *transform, ssize, &mut *player, collision_all_sides) {
         collision::Stop::None => {
             transform.translation.x += delta_x;
