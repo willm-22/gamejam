@@ -1,17 +1,12 @@
 use bevy::prelude::*;
 use crate::definitions;
-<<<<<<< HEAD
 use crate::clock::GameClock;
 use std::time::Duration;
 use crate::collision;
-=======
-use crate::collision;
->>>>>>> origin/master
 
 const STARTING_PLAYER_VELOCITY: (f32, f32) = (0.0, 0.0);
 
 
-<<<<<<< HEAD
 #[derive(Component)]
 pub struct Velocity {x: f32, y : f32}
 impl Velocity {
@@ -37,16 +32,13 @@ pub struct AnimationIndices {
     pub first: usize,
     pub last: usize,
 }
-=======
 
->>>>>>> origin/master
 
 
 
 pub fn spawn_player(starting_x: f32, starting_y: f32, commands: &mut Commands, asset_server: &AssetServer, layouts: &mut Assets<TextureAtlasLayout>) {
     // let shape: Handle<Mesh> = meshes.add(Rectangle::new(PLAYER_WIDTH, PLAYER_HEIGHT));
     // let mesh: Mesh2d = Mesh2d(shape);
-<<<<<<< HEAD
     let velocity = Velocity::new(STARTING_PLAYER_VELOCITY.0, STARTING_PLAYER_VELOCITY.1);
     let player = asset_server.load("player.png");
     let layout = layouts.add(TextureAtlasLayout::from_grid(UVec2::new(32, 32), 4, 1, None, None));
@@ -57,29 +49,21 @@ pub fn spawn_player(starting_x: f32, starting_y: f32, commands: &mut Commands, a
         TextureAtlas { layout, index: indices.first },
     );
 
-    sprite.custom_size = Some(Vec2::new(definitions::PLAYER_WIDTH, definitions::PLAYER_HEIGHT));
+    sprite.custom_size = Some(Vec2::new(definitions::PLAYER_SIZE.height, definitions::PLAYER_SIZE.width));
 
     commands.spawn((
             sprite,
-=======
-    let velocity = definitions::Velocity::new(STARTING_PLAYER_VELOCITY.0, STARTING_PLAYER_VELOCITY.1);
-    commands.spawn((
-            Sprite::from_color(colour, Vec2::new(definitions::PLAYER_SIZE.width, definitions::PLAYER_SIZE.height)),
->>>>>>> origin/master
             Transform::from_xyz(
                 starting_x,
                 starting_y,
                 0.0,
             ),
             definitions::Player,
-            velocity,
-<<<<<<< HEAD
+            // velocity,
             indices,
             AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
-=======
             definitions::LevelEntity,
             definitions::PLAYER_SIZE
->>>>>>> origin/master
             ));
 }
 
@@ -90,8 +74,8 @@ pub fn move_player(
     collision_all_sides: Query<(&mut Transform, &definitions::Size, &definitions::Collision), Without<definitions::Player>>)
 {
 
-<<<<<<< HEAD
-    let (mut transform, mut velocity) = current_movement.into_inner();
+    let (mut transform, mut velocity, ssize) = player.into_inner();
+
     let delta_time = time.delta_secs();
     const ACCEL: f32 = 600.0;
     const GRAVITY: f32 = 300.0;
@@ -103,18 +87,10 @@ pub fn move_player(
     if input.pressed(KeyCode::KeyW) { velocity.y += ACCEL * delta_time; }
 
     if input.pressed(KeyCode::KeyS) { velocity.y -= ACCEL * delta_time; }
-=======
-    let (mut transform, mut velocity, ssize) = player.into_inner();
->>>>>>> origin/master
 
-    
     velocity.mult(0.95);
 
-<<<<<<< HEAD
     velocity.y -= GRAVITY * delta_time;
-=======
-    // velocity.y -= 5.0;
->>>>>>> origin/master
 
     if velocity.x >= 100.0 { velocity.x = 100.0}
     if velocity.x <= -100.0 { velocity.x = -100.0}
