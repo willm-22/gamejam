@@ -9,6 +9,7 @@ mod definitions;
 mod collision;
 mod music;
 mod clock;
+mod camera;
 use level_placer::draw_level;
 
 use bevy::prelude::*;
@@ -32,6 +33,7 @@ fn main() {
         .add_systems(Startup, clock::setup_clock)
         .add_systems(Update, (clock::update_clock, clock::update_clock_text))
         .add_systems(Update, player::move_player)
+        .add_systems(Update, camera::follow_player)
         // .add_systems(Update, bob)
         .run();
 
