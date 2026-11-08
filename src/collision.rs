@@ -6,7 +6,7 @@ pub enum Stop {Sideways, Verticle, None}
 //very much based on https://bevy.org/examples/games/breakout/
 pub fn check_collision(old_x: f32, old_y: f32, vel_x: f32, vel_y: f32,
     player_transformer: &mut Transform, player_size: &definitions::Size, player: &mut definitions::Player,
-    collision_all_sides: Query<(Transform, &definitions::Size, &definitions::Collision), Without<definitions::Player>>,
+    collision_all_sides: Query<(&mut Transform, &definitions::Size, &definitions::Collision), Without<definitions::Player>>,
     ) -> Stop {
         // let (mut player_transformer, velocity, player_size) = player.into_inner();
 
@@ -20,12 +20,12 @@ pub fn check_collision(old_x: f32, old_y: f32, vel_x: f32, vel_y: f32,
         let po_top_side = player_transformer.translation.y + p_half_height;
         let po_bottom_side = player_transformer.translation.y - p_half_height;
         
-        let pn_left_side = po_left_side + vel_x;
-        let pn_right_side = po_right_side + vel_x;
-        let pn_top_side = po_top_side + vel_y;
-        let pn_bottom_side = po_bottom_side + vel_y;
+        let pn_left_side = po_left_side + vel_x - p_half_width;
+        let pn_right_side = po_right_side + vel_x + p_half_width;
+        let pn_top_side = po_top_side + vel_y + p_half_height;
+        let pn_bottom_side = po_bottom_side + vel_y - p_half_height;
 
-        for (collider_location, collider_size, collider) in collision_all_sides {
+        for (collider_location, collider_size, collider) in &collision_all_sides {
             let c_half_height = collider_size.height / 2.0;
             let c_half_width = collider_size.width / 2.0;
 
@@ -46,8 +46,9 @@ pub fn check_collision(old_x: f32, old_y: f32, vel_x: f32, vel_y: f32,
                     definitions::CollisionAction::Death => {println!("Ow");},
                     definitions::CollisionAction::Goal => {println!("YAY")},
                     definitions::CollisionAction::Wall => {
-                        if collide_top && vel_y < 0.0 {
-                           
+                        if (collide_top && vel_y < 0.0) {
+                            println!("{}", vel_y);
+                            player_transformer.translation.y = c_top_side + p_half_height;
                             return Stop::Verticle;
                         }
                         if collide_bottom && vel_y > 0.0 {
@@ -60,6 +61,14 @@ pub fn check_collision(old_x: f32, old_y: f32, vel_x: f32, vel_y: f32,
                             return Stop::Sideways;
                         }
                     },
+                    definitions::CollisionAction::Top | definitions::CollisionAction::Move => {
+                        if collide_top && vel_y < 0.0 {
+                            player_transformer.translation.y = c_top_side + p_half_height;
+                            return Stop::Verticle;
+                        } else {
+                            return Stop::None;
+                        }
+                    }
                     _ => {}
             
                 }

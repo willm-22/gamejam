@@ -70,6 +70,7 @@ pub fn move_player(
 
     if input.pressed(KeyCode::KeyS) { velocity.y -= 10.0; }
 
+<<<<<<< HEAD
     velocity.x = velocity.x * delta_time;
     velocity.y = velocity.y * delta_time;
 
@@ -78,6 +79,13 @@ pub fn move_player(
 
     println!("vx = {:.0}, grounded = {}", velocity.x, player.on_ground);
 
+=======
+    let delta_x = velocity.x * delta_time;
+    let delta_y = velocity.y * delta_time;
+
+    println!("vx = {:.0}, grounded = {}", velocity.x, player.on_ground);
+
+>>>>>>> parent of 6056e7b (camera)
     match collision::check_collision(transform.translation.x, transform.translation.y, delta_x, delta_y, &mut *transform, ssize, &mut *player, collision_all_sides) {
         collision::Stop::None => {
             transform.translation.x += delta_x;
