@@ -20,7 +20,7 @@ pub fn update_clock(
     mut clock: ResMut<GameClock>,
     player: Single<&definitions::Velocity, With<definitions::Player>>,
 ) {
-    clock.scale = 1.0 - (player.speed() / 100.0).min(1.0) * 0.6;
+    clock.scale = 1.0 - (player.speed() / 100.0).min(1.0) * 0.9;
     clock.remaining = (clock.remaining - time.delta_secs() * clock.scale).max(0.0);
 }
 
