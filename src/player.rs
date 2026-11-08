@@ -53,7 +53,7 @@ pub fn move_player(
     input: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
     player: Single<(&mut Transform, &mut definitions::Velocity, &definitions::Size, &mut definitions::Player), With<definitions::Player>>,
-    collision_all_sides: Query<(&Transform, &definitions::Size, &definitions::Collision), Without<definitions::Player>>)
+    collision_all_sides: Query<(&mut Transform, &definitions::Size, &definitions::Collision), Without<definitions::Player>>)
 {
     let (mut transform, mut velocity, ssize, mut player) = player.into_inner();
     let delta_time = time.delta_secs();
@@ -73,7 +73,10 @@ pub fn move_player(
     velocity.x = velocity.x * delta_time;
     velocity.y = velocity.y * delta_time;
 
+    let delta_x = velocity.x * delta_time;
+    let delta_y = velocity.y * delta_time;
 
+<<<<<<< HEAD
     match collision::check_collision(
         transform.translation.x, transform.translation.y,
         velocity.x, velocity.y,
@@ -90,6 +93,21 @@ pub fn move_player(
         }
         collision::Stop::Sideways => {
             transform.translation.y += velocity.y;
+=======
+    println!("vx = {:.0}, grounded = {}", velocity.x, player.on_ground);
+
+    match collision::check_collision(transform.translation.x, transform.translation.y, delta_x, delta_y, &mut *transform, ssize, &mut *player, collision_all_sides) {
+        collision::Stop::None => {
+            transform.translation.x += delta_x;
+            transform.translation.y += delta_y;
+        }
+        collision::Stop::Verticle => {
+            transform.translation.x += delta_x;
+            velocity.y = 0.0;
+        }
+        collision::Stop::Sideways => {
+            transform.translation.y += delta_y;
+>>>>>>> parent of 6056e7b (camera)
             velocity.x = 0.0;
         }
     }

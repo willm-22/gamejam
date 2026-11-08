@@ -9,9 +9,13 @@ mod definitions;
 mod collision;
 mod music;
 mod clock;
+<<<<<<< HEAD
 mod camera;
 mod grapple;
 
+=======
+use level_placer::draw_level;
+>>>>>>> parent of 6056e7b (camera)
 
 use bevy::prelude::*;
 
@@ -35,7 +39,6 @@ fn main() {
         .add_systems(Update, (clock::update_clock, clock::update_clock_text))
         .add_systems(Update, grapple::grapple)
         .add_systems(Update, player::move_player)
-        .add_systems(Update, camera::follow_player)
         // .add_systems(Update, bob)
         .run();
 
