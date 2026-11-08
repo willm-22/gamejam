@@ -7,15 +7,11 @@ mod level_placer;
 mod player;
 mod definitions;
 mod clock;
+mod collision;
 
 use level_placer::draw_level;
 
 use bevy::prelude::*;
-
-
-
-#[derive(Component)]
-struct Collision;
 
 
 fn main() {
