@@ -2,7 +2,7 @@ use bevy::prelude::*;
 use crate::player;
 use crate::definitions;
 
-pub fn draw_level(mut commands: Commands) {
+pub fn draw_level(mut commands: Commands, asset_server: Res<AssetServer>, mut layouts: ResMut<Assets<TextureAtlasLayout>>) {
     let rows: Vec<&str> = definitions::LEVEL.lines().collect();
     let height = rows.len() as f32;
     let width = rows[0].len() as f32;
@@ -20,9 +20,10 @@ pub fn draw_level(mut commands: Commands) {
 
             match ch {
                 '#' => draw_tile(&mut commands, pos, Color::srgb(0.3, 0.3, 0.4), definitions::Collision {action: definitions::CollisionAction::Wall}),
-                'P' => player::spawn_player(pos.x, pos.y, &mut commands, Color::srgb(0.3, 0.8, 0.4)),
+                'P' => player::spawn_player(pos.x, pos.y, &mut commands, &asset_server, &mut layouts),
                 'G' => draw_tile(&mut commands, pos, Color::srgb(0.3, 0.3, 0.4), definitions::Collision {action: definitions::CollisionAction::Goal}),
                 'X' => draw_tile(&mut commands, pos, Color::srgb(0.3, 0.3, 0.4), definitions::Collision {action: definitions::CollisionAction::Death}),
+                'T' => draw_tile(&mut commands, pos, Color::srgb(0.3, 0.3, 0.4), definitions::Collision {action: definitions::CollisionAction::Top}),
                 _ => {}
             }
         }

@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 use crate::definitions;
+use crate::clock::GameClock;
+use std::time::Duration;
 
 const STARTING_PLAYER_VELOCITY: (f32, f32) = (0.0, 0.0);
 
@@ -7,11 +9,6 @@ const STARTING_PLAYER_VELOCITY: (f32, f32) = (0.0, 0.0);
 #[derive(Component)]
 pub struct Velocity {x: f32, y : f32}
 impl Velocity {
-    fn init(&mut self, x: f32, y: f32) {
-        self.x = x;
-        self.y = y;
-    }
-
     fn new(x: f32, y: f32) -> Velocity {
         Velocity {x, y}
     }
@@ -20,22 +17,49 @@ impl Velocity {
         self.x = self.x * num;
     }
 
+    pub fn speed(&self) -> f32 {
+        Vec2::new(self.x, self.y).length()
+    }
+
+}
+
+#[derive(Component)]
+pub struct AnimationTimer(pub Timer);
+
+#[derive(Component)]
+pub struct AnimationIndices {
+    pub first: usize,
+    pub last: usize,
 }
 
 
-pub fn spawn_player(starting_x: f32, starting_y: f32, commands: &mut Commands,  colour: Color) {
+
+pub fn spawn_player(starting_x: f32, starting_y: f32, commands: &mut Commands, asset_server: &AssetServer, layouts: &mut Assets<TextureAtlasLayout>) {
     // let shape: Handle<Mesh> = meshes.add(Rectangle::new(PLAYER_WIDTH, PLAYER_HEIGHT));
     // let mesh: Mesh2d = Mesh2d(shape);
     let velocity = Velocity::new(STARTING_PLAYER_VELOCITY.0, STARTING_PLAYER_VELOCITY.1);
+    let player = asset_server.load("player.png");
+    let layout = layouts.add(TextureAtlasLayout::from_grid(UVec2::new(32, 32), 4, 1, None, None));
+    let indices = AnimationIndices { first: 0, last: 3 };
+
+    let mut sprite = Sprite::from_atlas_image(
+        player,
+        TextureAtlas { layout, index: indices.first },
+    );
+
+    sprite.custom_size = Some(Vec2::new(definitions::PLAYER_WIDTH, definitions::PLAYER_HEIGHT));
+
     commands.spawn((
-            Sprite::from_color(colour, Vec2::new(definitions::PLAYER_WIDTH, definitions::PLAYER_HEIGHT)),
+            sprite,
             Transform::from_xyz(
                 starting_x,
                 starting_y,
                 0.0,
             ),
             definitions::Player,
-            velocity
+            velocity,
+            indices,
+            AnimationTimer(Timer::from_seconds(0.1, TimerMode::Repeating)),
             ));
 }
 
@@ -46,26 +70,27 @@ pub fn move_player(
 {
 
     let (mut transform, mut velocity) = current_movement.into_inner();
+    let delta_time = time.delta_secs();
+    const ACCEL: f32 = 600.0;
+    const GRAVITY: f32 = 300.0;
 
-    if input.pressed(KeyCode::KeyA) {
-        velocity.x -= 10.0;
-    }
-    if input.pressed(KeyCode::KeyD) {
-        velocity.x += 10.0;
-    }
-    if input.pressed(KeyCode::KeyW) {
-        velocity.y += 10.0;
-    }
-    if input.pressed(KeyCode::KeyS) {
-        velocity.y -= 10.0;
-    }
+    if input.pressed(KeyCode::KeyA) { velocity.x -= ACCEL * delta_time; }
+
+    if input.pressed(KeyCode::KeyD) { velocity.x += ACCEL * delta_time; }
+
+    if input.pressed(KeyCode::KeyW) { velocity.y += ACCEL * delta_time; }
+
+    if input.pressed(KeyCode::KeyS) { velocity.y -= ACCEL * delta_time; }
+
     
     velocity.mult(0.95);
 
-    velocity.y -= 5.0;
+    velocity.y -= GRAVITY * delta_time;
 
     if velocity.x >= 100.0 { velocity.x = 100.0}
-    if velocity.y >= 100.0 { velocity.x = 100.0}
+    if velocity.x <= -100.0 { velocity.x = -100.0}
+    if velocity.y >= 100.0 { velocity.y = 100.0}
+    if velocity.y <= -100.0 { velocity.y = -100.0}
 
     let delta_x = velocity.x * time.delta_secs();
     let delta_y = velocity.y * time.delta_secs();
@@ -73,4 +98,22 @@ pub fn move_player(
     transform.translation.y += delta_y;
 
 }
-        
+
+pub fn animate_player(
+    time: Res<Time>,
+    clock: Res<GameClock>,
+    mut query: Query<(&AnimationIndices, &mut AnimationTimer, &mut Sprite), With<definitions::Player>>,
+) {
+    for (indices, mut timer, mut sprite) in &mut query {
+        timer.0.tick(Duration::from_secs_f32(time.delta_secs() * clock.scale));
+        if timer.0.just_finished() {
+            if let Some(atlas) = &mut sprite.texture_atlas {
+                atlas.index = if atlas.index >= indices.last {
+                    indices.first
+                } else {
+                    atlas.index + 1
+                };
+            }
+        }
+    }
+}

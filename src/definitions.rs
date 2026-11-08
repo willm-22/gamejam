@@ -8,12 +8,8 @@ pub enum CollisionAction {
     Wall,
     Death,
     Goal,
+    Top,
     Nothing,
-}
-
-#[derive(Component)]
-pub struct CollisionTop {
-    pub action: CollisionAction,
 }
 
 #[derive(Component)]

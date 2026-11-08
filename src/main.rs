@@ -6,6 +6,7 @@
 mod level_placer;
 mod player;
 mod definitions;
+mod clock;
 
 use level_placer::draw_level;
 
@@ -23,8 +24,12 @@ fn main() {
         .add_plugins(DefaultPlugins)
         .add_systems(Startup, (startup, draw_level))
         .add_systems(Startup, startup)
+        .add_systems(Startup, clock::setup_clock)
         .add_systems(Startup, test)
         .add_systems(Update, player::move_player)
+        .add_systems(Update, clock::update_clock)
+        .add_systems(Update, clock::update_clock_text)
+        .add_systems(Update, player::animate_player)
         // .add_systems(Update, bob)
         .run();
 
