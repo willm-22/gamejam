@@ -6,6 +6,7 @@
 mod level_placer;
 mod player;
 mod definitions;
+mod collision;
 
 use level_placer::draw_level;
 
