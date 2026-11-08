@@ -57,48 +57,45 @@ pub fn move_player(
 {
     let (mut transform, mut velocity, ssize, mut player) = player.into_inner();
     let delta_time = time.delta_secs();
-    const JUMP: f32 = 1000.0;
-    if input.pressed(KeyCode::KeyA) {velocity.x -= 100.0;}
-    if input.pressed(KeyCode::KeyD) {velocity.x += 100.0;}
+    const JUMP: f32 = 300.0;
+    if input.pressed(KeyCode::KeyA) {velocity.x -= 50.0;}
+    if input.pressed(KeyCode::KeyD) {velocity.x += 50.0;}
 
     if input.pressed(KeyCode::KeyW) && player.on_ground {
         velocity.y = JUMP;
     } 
     if !player.on_ground {
-        velocity.y -= 10.0;
+        velocity.y -= 30.0;
     }
 
     if input.pressed(KeyCode::KeyS) { velocity.y -= 10.0; }
-
-<<<<<<< HEAD
-    velocity.x = velocity.x * delta_time;
-    velocity.y = velocity.y * delta_time;
-
+    if velocity.x > 300.0 {velocity.x = 300.0}
+    if velocity.y > 300.0 {velocity.y = 300.0}
+    if velocity.x < -300.0 {velocity.x = -300.0}
+    if velocity.y < -300.0 {velocity.y = -300.0}
     let delta_x = velocity.x * delta_time;
     let delta_y = velocity.y * delta_time;
 
     println!("vx = {:.0}, grounded = {}", velocity.x, player.on_ground);
 
-=======
-    let delta_x = velocity.x * delta_time;
-    let delta_y = velocity.y * delta_time;
-
-    println!("vx = {:.0}, grounded = {}", velocity.x, player.on_ground);
-
->>>>>>> parent of 6056e7b (camera)
     match collision::check_collision(transform.translation.x, transform.translation.y, delta_x, delta_y, &mut *transform, ssize, &mut *player, collision_all_sides) {
-        collision::Stop::None => {
+        0 => {
             transform.translation.x += delta_x;
             transform.translation.y += delta_y;
         }
-        collision::Stop::Verticle => {
+        1 => {
             transform.translation.x += delta_x;
             velocity.y = 0.0;
         }
-        collision::Stop::Sideways => {
+        2 => {
             transform.translation.y += delta_y;
             velocity.x = 0.0;
         }
+        3 => {
+            velocity.x = 0.0;
+            velocity.y = 0.0;
+        }
+        _ => {;}
     }
 }
 

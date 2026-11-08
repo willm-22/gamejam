@@ -1,13 +1,13 @@
-/* use bevy::prelude::*;
+use bevy::prelude::*;
 
 use crate::definitions;
 
-pub enum Stop {Sideways, Verticle, None}
+pub enum Stop {None, Verticle, Sideways, Both}
 //very much based on https://bevy.org/examples/games/breakout/
 pub fn check_collision(old_x: f32, old_y: f32, vel_x: f32, vel_y: f32,
     player_transformer: &mut Transform, player_size: &definitions::Size, player: &mut definitions::Player,
     collision_all_sides: Query<(&mut Transform, &definitions::Size, &definitions::Collision), Without<definitions::Player>>,
-    ) -> Stop {
+    ) -> i32 {
         // let (mut player_transformer, velocity, player_size) = player.into_inner();
 
         let new_x = old_x + vel_x;
@@ -46,27 +46,35 @@ pub fn check_collision(old_x: f32, old_y: f32, vel_x: f32, vel_y: f32,
                     definitions::CollisionAction::Death => {println!("Ow");},
                     definitions::CollisionAction::Goal => {println!("YAY")},
                     definitions::CollisionAction::Wall => {
+                        let mut count = 0;
                         if (collide_top && vel_y < 0.0) {
                             println!("{}", vel_y);
-                            player_transformer.translation.y = c_top_side + p_half_height;
-                            return Stop::Verticle;
+                            count += 1;
                         }
                         if collide_bottom && vel_y > 0.0 {
-                            return Stop::Verticle;
+
+                            count += 1;
                         }
                         if collide_right && vel_x < 0.0 {
-                            return Stop::Sideways;
+                            player_transformer.translation.x = c_right_side + p_half_width;
+                            count +=  2;
                         }
                         if collide_left && vel_x > 0.0 {
-                            return Stop::Sideways;
+                            player_transformer.translation.x = c_left_side - p_half_width;
+                            count += 2;
                         }
+                        if count > 3 {
+                            count = 3;
+                        }
+                        return count;
+
                     },
                     definitions::CollisionAction::Top | definitions::CollisionAction::Move => {
                         if collide_top && vel_y < 0.0 {
                             player_transformer.translation.y = c_top_side + p_half_height;
-                            return Stop::Verticle;
+                            return 1;
                         } else {
-                            return Stop::None;
+                            return 0;
                         }
                     }
                     _ => {}
@@ -75,7 +83,7 @@ pub fn check_collision(old_x: f32, old_y: f32, vel_x: f32, vel_y: f32,
             
             }
         }
-        return Stop::None;
+        return 0;
 
     }
     
@@ -83,95 +91,93 @@ pub fn check_collision(old_x: f32, old_y: f32, vel_x: f32, vel_y: f32,
     fn check_between(lower: f32, higher: f32, value: f32) -> bool {
         return (lower < value && value < higher);
     }
+// use bevy::prelude::*;
 
-    */
-use bevy::prelude::*;
+// use crate::definitions;
 
-use crate::definitions;
+// /// What the player ran into during one call to `move_and_collide`.
+// #[derive(Default)]
+// pub struct Hit {
+//     pub x: bool,      // blocked sideways by a wall
+//     pub y: bool,      // blocked vertically (floor or ceiling)
+//     pub ground: bool, // landed on top of a wall
+//     pub died: bool,   // touching a Death tile
+//     pub goal: bool,   // touching a Goal tile
+// }
 
-/// What the player ran into during one call to `move_and_collide`.
-#[derive(Default)]
-pub struct Hit {
-    pub x: bool,      // blocked sideways by a wall
-    pub y: bool,      // blocked vertically (floor or ceiling)
-    pub ground: bool, // landed on top of a wall
-    pub died: bool,   // touching a Death tile
-    pub goal: bool,   // touching a Goal tile
-}
+// // Tiny tolerance so floating point error never turns "touching" into "overlapping".
+// const EPS: f32 = 0.01;
 
-// Tiny tolerance so floating point error never turns "touching" into "overlapping".
-const EPS: f32 = 0.01;
+// fn overlaps(
+//     a_pos: Vec3,
+//     a: &definitions::Size,
+//     b_pos: Vec3,
+//     b: &definitions::Size,
+//     eps: f32,
+// ) -> bool {
+//     (a_pos.x - b_pos.x).abs() < (a.width + b.width) / 2.0 - eps
+//         && (a_pos.y - b_pos.y).abs() < (a.height + b.height) / 2.0 - eps
+// }
 
-fn overlaps(
-    a_pos: Vec3,
-    a: &definitions::Size,
-    b_pos: Vec3,
-    b: &definitions::Size,
-    eps: f32,
-) -> bool {
-    (a_pos.x - b_pos.x).abs() < (a.width + b.width) / 2.0 - eps
-        && (a_pos.y - b_pos.y).abs() < (a.height + b.height) / 2.0 - eps
-}
+// fn is_wall(c: &definitions::Collision) -> bool {
+//     matches!(c.action, definitions::CollisionAction::Wall)
+// }
 
-fn is_wall(c: &definitions::Collision) -> bool {
-    matches!(c.action, definitions::CollisionAction::Wall)
-}
+// /// Moves the player by `step`, one axis at a time, pushing it out of any wall it ends up inside.
+// /// Call this several times per frame with small steps to avoid tunnelling at high speed.
+// pub fn move_and_collide(
+//     transform: &mut Transform,
+//     size: &definitions::Size,
+//     step: Vec2,
+//     colliders: &Query<
+//         (&Transform, &definitions::Size, &definitions::Collision),
+//         Without<definitions::Player>,
+//     >,
+// ) -> Hit {
+//     let mut hit = Hit::default();
 
-/// Moves the player by `step`, one axis at a time, pushing it out of any wall it ends up inside.
-/// Call this several times per frame with small steps to avoid tunnelling at high speed.
-pub fn move_and_collide(
-    transform: &mut Transform,
-    size: &definitions::Size,
-    step: Vec2,
-    colliders: &Query<
-        (&Transform, &definitions::Size, &definitions::Collision),
-        Without<definitions::Player>,
-    >,
-) -> Hit {
-    let mut hit = Hit::default();
+//     // ---- X axis ----
+//     transform.translation.x += step.x;
+//     for (c_t, c_size, c) in colliders.iter() {
+//         if is_wall(c) && overlaps(transform.translation, size, c_t.translation, c_size, EPS) {
+//             let gap = (size.width + c_size.width) / 2.0;
+//             if step.x > 0.0 {
+//                 transform.translation.x = c_t.translation.x - gap; // hit the wall's left side
+//                 hit.x = true;
+//             } else if step.x < 0.0 {
+//                 transform.translation.x = c_t.translation.x + gap; // hit the wall's right side
+//                 hit.x = true;
+//             }
+//         }
+//     }
 
-    // ---- X axis ----
-    transform.translation.x += step.x;
-    for (c_t, c_size, c) in colliders.iter() {
-        if is_wall(c) && overlaps(transform.translation, size, c_t.translation, c_size, EPS) {
-            let gap = (size.width + c_size.width) / 2.0;
-            if step.x > 0.0 {
-                transform.translation.x = c_t.translation.x - gap; // hit the wall's left side
-                hit.x = true;
-            } else if step.x < 0.0 {
-                transform.translation.x = c_t.translation.x + gap; // hit the wall's right side
-                hit.x = true;
-            }
-        }
-    }
+//     // ---- Y axis ----
+//     transform.translation.y += step.y;
+//     for (c_t, c_size, c) in colliders.iter() {
+//         if is_wall(c) && overlaps(transform.translation, size, c_t.translation, c_size, EPS) {
+//             let gap = (size.height + c_size.height) / 2.0;
+//             if step.y < 0.0 {
+//                 transform.translation.y = c_t.translation.y + gap; // landed on top
+//                 hit.y = true;
+//                 hit.ground = true;
+//             } else if step.y > 0.0 {
+//                 transform.translation.y = c_t.translation.y - gap; // bumped head
+//                 hit.y = true;
+//             }
+//         }
+//     }
 
-    // ---- Y axis ----
-    transform.translation.y += step.y;
-    for (c_t, c_size, c) in colliders.iter() {
-        if is_wall(c) && overlaps(transform.translation, size, c_t.translation, c_size, EPS) {
-            let gap = (size.height + c_size.height) / 2.0;
-            if step.y < 0.0 {
-                transform.translation.y = c_t.translation.y + gap; // landed on top
-                hit.y = true;
-                hit.ground = true;
-            } else if step.y > 0.0 {
-                transform.translation.y = c_t.translation.y - gap; // bumped head
-                hit.y = true;
-            }
-        }
-    }
+//     // ---- Non-solid tiles (nothing is pushed out of these) ----
+//     for (c_t, c_size, c) in colliders.iter() {
+//         if overlaps(transform.translation, size, c_t.translation, c_size, 0.0) {
+//             match c.action {
+//                 definitions::CollisionAction::Death => hit.died = true,
+//                 definitions::CollisionAction::Goal => hit.goal = true,
+//                 _ => {}
+//             }
+//         }
+//     }
 
-    // ---- Non-solid tiles (nothing is pushed out of these) ----
-    for (c_t, c_size, c) in colliders.iter() {
-        if overlaps(transform.translation, size, c_t.translation, c_size, 0.0) {
-            match c.action {
-                definitions::CollisionAction::Death => hit.died = true,
-                definitions::CollisionAction::Goal => hit.goal = true,
-                _ => {}
-            }
-        }
-    }
-
-    hit
-}
+//     hit
+// }
  
