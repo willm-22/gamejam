@@ -42,6 +42,7 @@ pub fn check_collision(old_x: f32, old_y: f32, vel_x: f32, vel_y: f32,
             player.on_ground = collide_top;
             if collide_left | collide_right | collide_top | collide_bottom {
                 match collider.action {
+                    definitions::CollisionAction::Move => {},
                     definitions::CollisionAction::Death => {println!("Ow");},
                     definitions::CollisionAction::Goal => {println!("YAY")},
                     definitions::CollisionAction::Wall => {

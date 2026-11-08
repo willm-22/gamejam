@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // since we are learning bevy from scratch, here are the resources used to learn from
 // https://aibodh.com/posts/bevy-rust-game-development-chapter-1/ 1.
 // https://bevy.org/examples/2d-rendering/2d-shapes/ 2.
@@ -64,3 +65,8 @@ fn bob() {
    // bob is a placeholder bob does not do anything
    println!("bob");
 }
+=======
+fn main() {
+    println!("Hello, world!");
+}
+>>>>>>> parent of 84f5557 (This is all stolen code so far to get the idea of Bevy. Remake it completely when we are ready)

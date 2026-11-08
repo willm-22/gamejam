@@ -57,78 +57,48 @@ pub fn move_player(
 {
     let (mut transform, mut velocity, ssize, mut player) = player.into_inner();
     let delta_time = time.delta_secs().min(1.0 / 30.0);
-
-    const BASE_ACCEL: f32 = 300.0;
-    const GROWTH: f32 = 3.0;
-    const BRAKE: f32 = 8000.0;
-    const DOWN_ACCEL: f32 = 1500.0;
-    const GRAVITY: f32 = 1500.0;
-    const JUMP_SPEED: f32 = 1000.0;
-    const MAX_X: f32 = 1000.0;
-    const MAX_FALL: f32 = 1250.0;
-
-    let mut dir = 0.0;
-    if input.pressed(KeyCode::KeyA) { dir -= 1.0; }
-    if input.pressed(KeyCode::KeyD) { dir += 1.0; }
-
-    if dir != 0.0 {
-        let accel = if velocity.x * dir >= 0.0 {
-            BASE_ACCEL + GROWTH * velocity.x.abs()
-        } else {
-            BRAKE
-        };
-        velocity.x += dir * accel * delta_time;
-    }
+    const JUMP: f32 = 1000.0;
+    if input.pressed(KeyCode::KeyA) {velocity.x -= 100.0;}
+    if input.pressed(KeyCode::KeyD) {velocity.x += 100.0;}
 
     if input.pressed(KeyCode::KeyW) && player.on_ground {
-        velocity.y = JUMP_SPEED;
-    } else {
-        velocity.y -= GRAVITY * delta_time;
+        velocity.y = 700.0;
+    } 
+    if !player.on_ground {
+        velocity.y -= 100.0 * delta_time;
     }
-    if input.pressed(KeyCode::KeyS) { velocity.y -= DOWN_ACCEL * delta_time; }
 
-    velocity.x *= 0.97_f32.powf(delta_time * 60.0);
-    velocity.x = velocity.x.clamp(-MAX_X, MAX_X);
-    velocity.y = velocity.y.clamp(-MAX_FALL, JUMP_SPEED);
+    if input.pressed(KeyCode::KeyS) { velocity.y -= 100.0; }
+
+    velocity.x = velocity.x.clamp(-500.0, 500.0);
+    velocity.y = velocity.y.clamp(-500.0, 500.0);
 
 
     let mut step_x = velocity.x * delta_time;
     let mut step_y = velocity.y * delta_time;
 
-    // Split the move so no step is longer than 8px (a quarter of a tile)
-    let steps = ((step_x.abs().max(step_y.abs())) / 8.0).ceil().max(1.0) as i32;
-    step_x /= steps as f32;
-    step_y /= steps as f32;
-
-    let mut grounded = false;
-
-    for _ in 0..steps {
-        match collision::check_collision(
-            transform.translation.x, transform.translation.y,
-            step_x, step_y,
-            &mut *transform, ssize, &mut *player, &collision_all_sides,
-        ) {
-            collision::Stop::None => {
-                transform.translation.x += step_x;
-                transform.translation.y += step_y;
-            }
-            collision::Stop::Verticle => {
-                transform.translation.x += step_x;
-                velocity.y = 0.0;
-                step_y = 0.0; // stop pushing into the floor/ceiling for the rest of the frame
-            }
-            collision::Stop::Sideways => {
-                transform.translation.y += step_y;
-                velocity.x = 0.0;
-                step_x = 0.0; // stop pushing into the wall
-            }
+    match collision::check_collision(
+        transform.translation.x, transform.translation.y,
+        step_x, step_y,
+        &mut *transform, ssize, &mut *player, &collision_all_sides,
+    ) {
+        collision::Stop::None => {
+            transform.translation.x += step_x;
+            transform.translation.y += step_y;
         }
-        grounded |= player.on_ground;
+        collision::Stop::Verticle => {
+            transform.translation.x += step_x;
+            velocity.y = 0.0;
+            step_y = 0.0; // stop pushing into the floor/ceiling for the rest of the frame
+        }
+        collision::Stop::Sideways => {
+            transform.translation.y += step_y;
+            velocity.x = 0.0;
+            step_x = 0.0; // stop pushing into the wall
+        }
     }
-
-    // check_collision resets on_ground on every call, so keep it if any step landed
-    player.on_ground = grounded;
 }
+
 
 pub fn animate_player(
     time: Res<Time>,
