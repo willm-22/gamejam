@@ -43,7 +43,7 @@ fn test(mut commands: Commands,
     // player::spawn_player(commands, meshes, materials);
 }
 
-fn setup(
+fn startup(
     mut commands: Commands,
     asset_server: Res<AssetServer>,
     mut layouts: ResMut<Assets<TextureAtlasLayout>>,

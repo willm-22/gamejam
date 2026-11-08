@@ -23,11 +23,11 @@ pub fn draw_level(
             );
 
             match ch {
-                '#' => draw_tile(&mut commands, pos, Color::srgb(0.3, 0.3, 0.4), definitions::Collision {action: definitions::CollisionAction::Wall}),
-                'P' => player::spawn_player(pos.x, pos.y, &mut commands, &asset_server, &mut layouts),
-                'G' => draw_tile(&mut commands, pos, Color::srgb(0.3, 0.3, 0.4), definitions::Collision {action: definitions::CollisionAction::Goal}),
-                'X' => draw_tile(&mut commands, pos, Color::srgb(0.3, 0.3, 0.4), definitions::Collision {action: definitions::CollisionAction::Death}),
-                'T' => draw_tile(&mut commands, pos, Color::srgb(0.8, 0.8, 0.2), definitions::Collision {action: definitions::CollisionAction::Top}),
+                '#' => draw_tile(commands, pos, Color::srgb(0.3, 0.3, 0.4), definitions::Collision { action: definitions::CollisionAction::Wall }),
+                'P' => player::spawn_player(pos.x, pos.y, commands, asset_server, layouts),
+                'G' => draw_tile(commands, pos, Color::srgb(0.3, 0.3, 0.4), definitions::Collision { action: definitions::CollisionAction::Goal }),
+                'X' => draw_tile(commands, pos, Color::srgb(0.3, 0.3, 0.4), definitions::Collision { action: definitions::CollisionAction::Death }),
+                'T' => draw_tile(commands, pos, Color::srgb(0.8, 0.8, 0.2), definitions::Collision { action: definitions::CollisionAction::Top }),
                 _ => {}
             }
         }

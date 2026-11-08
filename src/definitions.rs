@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-pub const LEVEL: &str = include_str!("../assets/level1.txt");
 
 pub const TILE: f32 = 32.0;
 
